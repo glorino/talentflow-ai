@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { employees, departments, jobTitles } from "@talentflow/database/src/schema";
-import { eq, desc, count, sql } from "drizzle-orm";
+import { db, employees, departments } from "@/lib/db";
+import { eq, desc } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +21,6 @@ export async function GET(request: NextRequest) {
         phone: employees.phone,
         avatar: employees.avatar,
         departmentId: employees.departmentId,
-        jobTitleId: employees.jobTitleId,
         managerId: employees.managerId,
         employmentType: employees.employmentType,
         employmentStatus: employees.employmentStatus,
@@ -32,7 +30,6 @@ export async function GET(request: NextRequest) {
       })
       .from(employees)
       .leftJoin(departments, eq(employees.departmentId, departments.id))
-      .leftJoin(jobTitles, eq(employees.jobTitleId, jobTitles.id))
       .orderBy(desc(employees.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
@@ -46,7 +43,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (status) {
-      query = query.where(eq(employees.employmentStatus, status as any));
+      query = query.where(eq(employees.employmentStatus, status));
     }
 
     const data = await query;
@@ -88,7 +85,6 @@ export async function POST(request: NextRequest) {
         email: body.email,
         phone: body.phone,
         departmentId: body.departmentId,
-        jobTitleId: body.jobTitleId,
         managerId: body.managerId,
         employmentType: body.employmentType,
         employmentStatus: body.employmentStatus || "active",
