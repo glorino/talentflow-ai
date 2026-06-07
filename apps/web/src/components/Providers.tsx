@@ -1,10 +1,12 @@
 "use client";
 
-import { ClerkProvider as BaseClerkProvider, SignIn, SignedIn, SignedOut } from "@clerk/nextjs";
+import { ReactNode, Suspense } from "react";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+function ClerkLoaded({ children }: { children: ReactNode }) {
+  const { ClerkProvider, SignIn, SignedIn, SignedOut } = require("@clerk/nextjs");
+
   return (
-    <BaseClerkProvider>
+    <ClerkProvider>
       <SignedOut>
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
           <div className="w-full max-w-md space-y-8 p-8">
@@ -26,6 +28,30 @@ export function Providers({ children }: { children: React.ReactNode }) {
         </div>
       </SignedOut>
       <SignedIn>{children}</SignedIn>
-    </BaseClerkProvider>
+    </ClerkProvider>
+  );
+}
+
+function Fallback({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="w-full max-w-md space-y-8 p-8 text-center">
+        <h1 className="gradient-text text-4xl font-bold">TalentFlow AI</h1>
+        <p className="text-muted-foreground">
+          Enterprise AI-Powered HR Operating System
+        </p>
+        <div className="animate-pulse rounded-lg border bg-card p-6 shadow-sm">
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={<Fallback>{children}</Fallback>}>
+      <ClerkLoaded>{children}</ClerkLoaded>
+    </Suspense>
   );
 }
