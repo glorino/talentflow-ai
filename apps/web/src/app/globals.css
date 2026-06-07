@@ -4,44 +4,60 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Workday-inspired professional palette */
+    --background: 210 20% 99%;
+    --foreground: 222 47% 8%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --card-foreground: 222 47% 8%;
+    --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 263 70% 58%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+    --radius: 0.625rem;
+
+    /* Extended palette */
+    --success: 142 76% 36%;
+    --success-light: 142 76% 96%;
+    --warning: 32 95% 53%;
+    --warning-light: 32 95% 96%;
+    --info: 217 91% 60%;
+    --info-light: 217 91% 96%;
+
+    /* Chart colors */
+    --chart-1: 221 83% 53%;
+    --chart-2: 263 70% 58%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 32 95% 53%;
+    --chart-5: 346 77% 50%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222 47% 6%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 222 47% 8%;
     --card-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 6%;
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 263 70% 65%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 76% 48%;
   }
 }
 
@@ -50,15 +66,193 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01", "cv01";
   }
 }
 
-@layer utilities {
-  .glass {
-    @apply bg-white/80 backdrop-blur-xl;
+/* Workday-style enterprise design system */
+@layer components {
+  /* Sidebar */
+  .sidebar-item {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200;
+    @apply text-muted-foreground hover:bg-accent/5 hover:text-foreground;
   }
-  .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  .sidebar-item.active {
+    @apply bg-primary/8 text-primary font-semibold;
+    box-shadow: inset 3px 0 0 0 hsl(var(--primary));
   }
+
+  /* Cards - Workday enterprise style */
+  .card-enterprise {
+    @apply rounded-xl border bg-card shadow-sm;
+    @apply transition-all duration-200;
+  }
+  .card-enterprise:hover {
+    @apply shadow-md;
+    border-color: hsl(var(--border) / 0.8);
+  }
+
+  /* Stat cards */
+  .stat-card {
+    @apply card-enterprise relative overflow-hidden p-5;
+  }
+  .stat-card::before {
+    content: "";
+    @apply absolute inset-0 opacity-[0.03];
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+
+  /* BambooHR-style warm badges */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .badge-success {
+    @apply badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200;
+  }
+  .badge-warning {
+    @apply badge bg-amber-50 text-amber-700 ring-1 ring-amber-200;
+  }
+  .badge-danger {
+    @apply badge bg-red-50 text-red-700 ring-1 ring-red-200;
+  }
+  .badge-info {
+    @apply badge bg-blue-50 text-blue-700 ring-1 ring-blue-200;
+  }
+  .badge-neutral {
+    @apply badge bg-gray-50 text-gray-700 ring-1 ring-gray-200;
+  }
+  .badge-purple {
+    @apply badge bg-purple-50 text-purple-700 ring-1 ring-purple-200;
+  }
+
+  /* AI insight cards */
+  .ai-insight-card {
+    @apply card-enterprise relative overflow-hidden;
+    @apply border-l-[3px];
+  }
+  .ai-insight-card.high {
+    @apply border-l-red-500;
+  }
+  .ai-insight-card.medium {
+    @apply border-l-amber-500;
+  }
+  .ai-insight-card.low {
+    @apply border-l-emerald-500;
+  }
+
+  /* Progress bars - BambooHR style */
+  .progress-bar {
+    @apply h-2 w-full overflow-hidden rounded-full bg-muted;
+  }
+  .progress-bar-fill {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+  }
+
+  /* Tables - Workday data-dense style */
+  .data-table {
+    @apply w-full text-sm;
+  }
+  .data-table th {
+    @apply border-b px-4 py-3 text-left font-semibold text-muted-foreground;
+  }
+  .data-table td {
+    @apply border-b px-4 py-3;
+  }
+  .data-table tr:hover td {
+    @apply bg-muted/30;
+  }
+
+  /* Floating AI assistant */
+  .ai-fab {
+    @apply fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center;
+    @apply rounded-full bg-gradient-to-br from-primary to-accent;
+    @apply text-white shadow-lg transition-all duration-300;
+    @apply hover:scale-110 hover:shadow-xl;
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  /* Metric sparkline */
+  .sparkline {
+    @apply h-8 w-16;
+  }
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsla(var(--primary), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 4px hsla(var(--primary), 0.2);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+/* Stagger children */
+.stagger-children > * {
+  animation: slide-up 0.4s ease-out forwards;
+  opacity: 0;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 350ms; }
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.3);
 }
