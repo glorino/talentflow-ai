@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "buildCommand": "cd ../.. && npx turbo build --filter=@talentflow/web",
-  "installCommand": "cd ../.. && npm install",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
   "outputDirectory": ".next",
   "functions": {
     "src/app/api/**/*.ts": {
