@@ -4,9 +4,6 @@
   "buildCommand": "cd ../.. && npm run build --filter=@talentflow/web",
   "installCommand": "cd ../.. && npm install",
   "outputDirectory": ".next",
-  "install": {
-    "installCommand": "cd ../.. && npm ci"
-  },
   "regions": ["iad1", "sfo1", "lhr1", "hnd1", "syd1"],
   "functions": {
     "src/app/api/**/*.ts": {
