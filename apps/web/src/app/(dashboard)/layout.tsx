@@ -155,7 +155,7 @@ export default function DashboardLayout({
                         className={cn(
                           "block rounded-md px-3 py-2 text-sm transition-colors",
                           pathname === child.href
-                            ? "bg-primary/8 text-primary font-medium"
+                            ? "text-primary font-medium"
                             : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         )}
                       >

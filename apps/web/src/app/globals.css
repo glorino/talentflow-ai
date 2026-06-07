@@ -79,7 +79,8 @@
     @apply text-muted-foreground hover:bg-accent/5 hover:text-foreground;
   }
   .sidebar-item.active {
-    @apply bg-primary/8 text-primary font-semibold;
+    @apply text-primary font-semibold;
+    background-color: hsla(var(--primary), 0.08);
     box-shadow: inset 3px 0 0 0 hsl(var(--primary));
   }
 
