@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { useRouter, usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -23,6 +22,7 @@ import {
   X,
   Bell,
   Search,
+  LogOut,
 } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -48,8 +48,34 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedItems, setExpandedItems] = useState<string[]>(["Dashboard"]);
+  const [userName, setUserName] = useState("User");
+
+  useEffect(() => {
+    const token = localStorage.getItem("tf_token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    fetch("/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          setUserName(`${data.data.user.firstName} ${data.data.user.lastName}`);
+        }
+      })
+      .catch(() => {});
+  }, [router]);
+
+  function handleLogout() {
+    localStorage.removeItem("tf_token");
+    router.push("/login");
+  }
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) =>
@@ -132,14 +158,19 @@ export default function DashboardLayout({
         </nav>
 
         <div className="border-t p-4">
-          <UserButton
-            afterSignOutUrl="/"
-            appearance={{
-              elements: {
-                avatarBox: "h-8 w-8",
-              },
-            }}
-          />
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+              {userName.charAt(0)}
+            </div>
+            {sidebarOpen && (
+              <>
+                <span className="flex-1 truncate text-sm">{userName}</span>
+                <button onClick={handleLogout} className="rounded p-1 hover:bg-muted">
+                  <LogOut size={14} />
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </aside>
 

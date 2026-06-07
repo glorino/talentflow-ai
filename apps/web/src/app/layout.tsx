@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Providers } from "@/components/Providers";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-background antialiased">
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );
