@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function getOpenAI() {
+  const OpenAI = require("openai").default || require("openai");
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 const agents: Record<string, { name: string; systemPrompt: string }> = {
   recruitment: {
@@ -74,6 +76,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          agent: agentConfig.name,
+          action,
+          response: `[Mock Response] ${agentConfig.name} would process: ${JSON.stringify(input || {})}`,
+          confidence: 0.85,
+          note: "OpenAI API key not configured - returning mock response",
+        },
+      });
+    }
+
+    const openai = getOpenAI();
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [

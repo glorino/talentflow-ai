@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function getOpenAI() {
+  const OpenAI = require("openai").default || require("openai");
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 const workflows: Record<string, { name: string; description: string; steps: string[] }> = {
   new_hire_pipeline: {
@@ -54,6 +56,20 @@ export async function POST(
       );
     }
 
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          workflow: workflow.name,
+          steps: workflow.steps,
+          result: `[Mock Response] Workflow "${workflow.name}" would execute with input: ${JSON.stringify(input || {})}`,
+          status: "completed",
+          note: "OpenAI API key not configured - returning mock response",
+        },
+      });
+    }
+
+    const openai = getOpenAI();
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
