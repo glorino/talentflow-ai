@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
-import { useUser } from "@clerk/clerk-expo";
+import * as SecureStore from "expo-secure-store";
 import {
   Clock,
   Calendar,
@@ -11,6 +11,8 @@ import {
   Wallet,
   GraduationCap,
 } from "lucide-react";
+
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || "https://web-glopresc.vercel.app";
 
 const stats = [
   { label: "Hours Today", value: "7.5h", icon: Clock, color: "#2563eb" },
@@ -34,13 +36,31 @@ const recentActivity = [
 ];
 
 export default function DashboardScreen() {
-  const { user } = useUser();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
+  const [userName, setUserName] = useState("User");
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  async function fetchUser() {
+    try {
+      const token = await SecureStore.getItemAsync("tf_token");
+      if (!token) return;
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUserName(`${data.data.user.firstName}`);
+      }
+    } catch {}
+  }
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // Simulate API call
+    await fetchUser();
     setTimeout(() => setRefreshing(false), 1500);
   };
 
@@ -54,7 +74,7 @@ export default function DashboardScreen() {
       <View className="px-4 pt-2 pb-6">
         <View className="mb-6">
           <Text className="text-2xl font-bold text-gray-900">
-            Welcome back, {user?.firstName || "User"}
+            Welcome back, {userName}
           </Text>
           <Text className="text-gray-500">
             Here&apos;s your HR overview

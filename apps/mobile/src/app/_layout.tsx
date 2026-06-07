@@ -1,64 +1,64 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
-
-const tokenCache = {
-  getToken(key: string) {
-    return SecureStore.getItemAsync(key);
-  },
-  setToken(key: string, value: string) {
-    return SecureStore.setItemAsync(key, value);
-  },
-};
+import { useEffect, useState } from "react";
+import { View, ActivityIndicator } from "react-native";
 
 export default function RootLayout() {
-  return (
-    <ClerkProvider
-      tokenCache={tokenCache}
-      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
-    >
-      <StatusBar style="auto" />
-      <SignedIn>
-        <RootLayoutNav />
-      </SignedIn>
-      <SignedOut>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-        </Stack>
-      </SignedIn>
-    </ClerkProvider>
-  );
-}
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-function RootLayoutNav() {
+  useEffect(() => {
+    SecureStore.getItemAsync("tf_token").then((t) => {
+      setToken(t);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen
-        name="(modals)/leave-request"
-        options={{
-          presentation: "modal",
-          headerShown: true,
-          title: "Request Leave",
-        }}
-      />
-      <Stack.Screen
-        name="(modals)/clock-in"
-        options={{
-          presentation: "modal",
-          headerShown: true,
-          title: "Clock In/Out",
-        }}
-      />
-      <Stack.Screen
-        name="(modals)/expense-report"
-        options={{
-          presentation: "modal",
-          headerShown: true,
-          title: "Submit Expense",
-        }}
-      />
-    </Stack>
+    <>
+      <StatusBar style="auto" />
+      <Stack screenOptions={{ headerShown: false }}>
+        {token ? (
+          <>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+              name="(modals)/leave-request"
+              options={{
+                presentation: "modal",
+                headerShown: true,
+                title: "Request Leave",
+              }}
+            />
+            <Stack.Screen
+              name="(modals)/clock-in"
+              options={{
+                presentation: "modal",
+                headerShown: true,
+                title: "Clock In/Out",
+              }}
+            />
+            <Stack.Screen
+              name="(modals)/expense-report"
+              options={{
+                presentation: "modal",
+                headerShown: true,
+                title: "Submit Expense",
+              }}
+            />
+          </>
+        ) : (
+          <Stack.Screen name="(auth)" />
+        )}
+      </Stack>
+    </>
   );
 }

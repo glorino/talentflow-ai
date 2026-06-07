@@ -1,9 +1,7 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/clerk-expo";
 
 export default function AttendanceScreen() {
-  const { user } = useUser();
   const [isClockedIn, setIsClockedIn] = useState(false);
   const [clockInTime, setClockInTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
