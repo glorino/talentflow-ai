@@ -33,10 +33,10 @@ const workflows: Record<string, { name: string; description: string; steps: stri
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { workflowId: string } }
+  { params }: { params: Promise<{ workflowId: string }> }
 ) {
   try {
-    const { workflowId } = params;
+    const { workflowId } = await params;
     const body = await request.json();
     const { input } = body;
 

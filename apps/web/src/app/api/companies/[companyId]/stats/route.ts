@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db, departments, employees, jobPostings, leaves, attendance, payrollRecords, performanceReviews, learningCourses, complianceItems } from "@/lib/db";
+import { db, departments, employees, jobPostings, leaves, attendance, payrollRecords, performanceReviews, complianceItems } from "@/lib/db";
 import { eq, count } from "drizzle-orm";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { companyId: string } }
+  { params }: { params: Promise<{ companyId: string }> }
 ) {
   try {
-    const { companyId } = params;
+    const { companyId } = await params;
 
     const [
       deptCount,
