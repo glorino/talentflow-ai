@@ -1,46 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
+import { generateText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createAnthropic } from "@ai-sdk/anthropic";
 
-function getOpenAI() {
-  const OpenAI = require("openai").default || require("openai");
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function getAIProvider() {
+  if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    return createGoogleGenerativeAI({
+      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+    })("gemini-2.0-flash");
+  }
+  if (process.env.ANTHROPIC_API_KEY) {
+    return createAnthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    })("claude-sonnet-4-20250514");
+  }
+  if (process.env.OPENAI_API_KEY) {
+    return createOpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })("gpt-4o");
+  }
+  return null;
 }
 
 const agents: Record<string, { name: string; systemPrompt: string }> = {
   recruitment: {
     name: "Recruitment Agent",
-    systemPrompt: "You are an AI Recruitment Agent. Source talent, optimize job postings, and manage recruitment pipelines.",
+    systemPrompt: "You are an AI Recruitment Agent for TalentFlow HR. Source talent, optimize job postings, and manage recruitment pipelines. Respond with JSON.",
   },
   screening: {
     name: "Screening Agent",
-    systemPrompt: "You are an AI Screening Agent. Analyze resumes, rank candidates, and provide screening scores.",
+    systemPrompt: "You are an AI Screening Agent. Analyze resumes, rank candidates, and provide screening scores. Respond with JSON.",
   },
   interview: {
     name: "Interview Agent",
-    systemPrompt: "You are an AI Interview Agent. Generate questions, schedule interviews, and analyze feedback.",
+    systemPrompt: "You are an AI Interview Agent. Generate questions, schedule interviews, and analyze feedback. Respond with JSON.",
   },
   onboarding: {
     name: "Onboarding Agent",
-    systemPrompt: "You are an AI Onboarding Agent. Create onboarding plans and track new hire progress.",
+    systemPrompt: "You are an AI Onboarding Agent. Create onboarding plans and track new hire progress. Respond with JSON.",
   },
   payroll: {
     name: "Payroll Agent",
-    systemPrompt: "You are an AI Payroll Agent. Verify payroll calculations and detect anomalies.",
+    systemPrompt: "You are an AI Payroll Agent. Verify payroll calculations and detect anomalies. Respond with JSON.",
   },
   compliance: {
     name: "Compliance Agent",
-    systemPrompt: "You are an AI Compliance Agent. Monitor compliance and track certifications.",
+    systemPrompt: "You are an AI Compliance Agent. Monitor compliance and track certifications. Respond with JSON.",
   },
   performance: {
     name: "Performance Agent",
-    systemPrompt: "You are an AI Performance Agent. Analyze performance data and predict retention.",
+    systemPrompt: "You are an AI Performance Agent. Analyze performance data and predict retention. Respond with JSON.",
   },
   learning: {
     name: "Learning Agent",
-    systemPrompt: "You are an AI Learning Agent. Recommend learning paths and track progress.",
+    systemPrompt: "You are an AI Learning Agent. Recommend learning paths and track progress. Respond with JSON.",
   },
   exit: {
     name: "Exit Agent",
-    systemPrompt: "You are an AI Exit Agent. Manage offboarding and analyze attrition.",
+    systemPrompt: "You are an AI Exit Agent. Manage offboarding and analyze attrition. Respond with JSON.",
   },
 };
 
@@ -51,13 +69,7 @@ export async function POST(request: NextRequest) {
 
     if (!agent || !action) {
       return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "agent and action are required",
-          },
-        },
+        { success: false, error: { code: "VALIDATION_ERROR", message: "agent and action are required" } },
         { status: 400 }
       );
     }
@@ -65,61 +77,52 @@ export async function POST(request: NextRequest) {
     const agentConfig = agents[agent];
     if (!agentConfig) {
       return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: "NOT_FOUND",
-            message: `Agent '${agent}' not found`,
-          },
-        },
+        { success: false, error: { code: "NOT_FOUND", message: `Agent '${agent}' not found` } },
         { status: 404 }
       );
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    const ai = getAIProvider();
+
+    if (!ai) {
       return NextResponse.json({
         success: true,
         data: {
           agent: agentConfig.name,
           action,
-          response: `[Mock Response] ${agentConfig.name} would process: ${JSON.stringify(input || {})}`,
+          response: { summary: `[Mock] ${agentConfig.name} processed ${action}`, input },
           confidence: 0.85,
-          note: "OpenAI API key not configured - returning mock response",
+          note: "No AI provider configured. Set OPENAI_API_KEY, GOOGLE_GENERATIVE_AI_API_KEY, or ANTHROPIC_API_KEY",
         },
       });
     }
 
-    const openai = getOpenAI();
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: agentConfig.systemPrompt },
-        { role: "user", content: `Action: ${action}\nInput: ${JSON.stringify(input || {})}` },
-      ],
+    const { text } = await generateText({
+      model: ai,
+      system: agentConfig.systemPrompt,
+      prompt: `Action: ${action}\nInput: ${JSON.stringify(input || {})}\n\nProvide a structured response.`,
       temperature: 0.3,
-      max_tokens: 4096,
     });
 
-    const content = response.choices[0]?.message?.content || "";
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = { raw: text };
+    }
 
     return NextResponse.json({
       success: true,
       data: {
         agent: agentConfig.name,
         action,
-        response: content,
+        response: parsed,
         confidence: 0.85,
       },
     });
   } catch (error) {
     return NextResponse.json(
-      {
-        success: false,
-        error: {
-          code: "AGENT_ERROR",
-          message: error instanceof Error ? error.message : "Agent execution failed",
-        },
-      },
+      { success: false, error: { code: "AGENT_ERROR", message: error instanceof Error ? error.message : "Failed" } },
       { status: 500 }
     );
   }
@@ -129,11 +132,12 @@ export async function GET() {
   return NextResponse.json({
     success: true,
     data: {
-      agents: Object.keys(agents).map((key) => ({
-        id: key,
-        name: agents[key].name,
-        status: "active",
-      })),
+      agents: Object.keys(agents).map((key) => ({ id: key, name: agents[key].name, status: "active" })),
+      providers: {
+        openai: !!process.env.OPENAI_API_KEY,
+        google: !!process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+        anthropic: !!process.env.ANTHROPIC_API_KEY,
+      },
     },
   });
 }

@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { generateText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createAnthropic } from "@ai-sdk/anthropic";
 
-function getOpenAI() {
-  const OpenAI = require("openai").default || require("openai");
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function getAIProvider() {
+  if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    return createGoogleGenerativeAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY })("gemini-2.0-flash");
+  }
+  if (process.env.ANTHROPIC_API_KEY) {
+    return createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY })("claude-sonnet-4-20250514");
+  }
+  if (process.env.OPENAI_API_KEY) {
+    return createOpenAI({ apiKey: process.env.OPENAI_API_KEY })("gpt-4o");
+  }
+  return null;
 }
 
 const workflows: Record<string, { name: string; description: string; steps: string[] }> = {
@@ -45,67 +57,52 @@ export async function POST(
     const workflow = workflows[workflowId];
     if (!workflow) {
       return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: "NOT_FOUND",
-            message: `Workflow '${workflowId}' not found`,
-          },
-        },
+        { success: false, error: { code: "NOT_FOUND", message: `Workflow '${workflowId}' not found` } },
         { status: 404 }
       );
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    const ai = getAIProvider();
+
+    if (!ai) {
       return NextResponse.json({
         success: true,
         data: {
           workflow: workflow.name,
           steps: workflow.steps,
-          result: `[Mock Response] Workflow "${workflow.name}" would execute with input: ${JSON.stringify(input || {})}`,
+          result: { summary: `[Mock] Workflow "${workflow.name}" executed`, input },
           status: "completed",
-          note: "OpenAI API key not configured - returning mock response",
+          note: "No AI provider configured",
         },
       });
     }
 
-    const openai = getOpenAI();
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are an AI workflow orchestrator for HR. Execute the "${workflow.name}" workflow: ${workflow.description}. Steps: ${workflow.steps.join(", ")}.`,
-        },
-        {
-          role: "user",
-          content: `Execute workflow with input: ${JSON.stringify(input || {})}`,
-        },
-      ],
+    const { text } = await generateText({
+      model: ai,
+      system: `You are an AI workflow orchestrator for HR. Execute the "${workflow.name}" workflow: ${workflow.description}. Steps: ${workflow.steps.join(", ")}. Respond with JSON.`,
+      prompt: `Execute workflow with input: ${JSON.stringify(input || {})}`,
       temperature: 0.3,
-      max_tokens: 4096,
     });
 
-    const content = response.choices[0]?.message?.content || "";
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = { raw: text };
+    }
 
     return NextResponse.json({
       success: true,
       data: {
         workflow: workflow.name,
         steps: workflow.steps,
-        result: content,
+        result: parsed,
         status: "completed",
       },
     });
   } catch (error) {
     return NextResponse.json(
-      {
-        success: false,
-        error: {
-          code: "WORKFLOW_ERROR",
-          message: error instanceof Error ? error.message : "Workflow execution failed",
-        },
-      },
+      { success: false, error: { code: "WORKFLOW_ERROR", message: error instanceof Error ? error.message : "Failed" } },
       { status: 500 }
     );
   }
