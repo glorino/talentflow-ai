@@ -1,119 +1,75 @@
-# TalentFlow AI - Complete Deployment Links
+# TalentFlow AI - Live Links
 
-## 🌐 Production URLs
+## ✅ Deployment Complete
 
-| Service | URL | Status |
-|---------|-----|--------|
-| **Web App** | https://app.talentflow.ai | Ready to deploy |
-| **API** | https://app.talentflow.ai/api | Ready to deploy |
-| **Mobile iOS** | https://apps.apple.com/app/talentflow-ai/id123456789 | Pending App Store |
-| **Mobile Android** | https://play.google.com/store/apps/details?id=com.talentflow.ai | Pending Play Store |
+## 🌐 Web Application
 
-## 📊 Service Dashboards
+| Service | URL |
+|---------|-----|
+| **Production** | https://web-glopresc.vercel.app |
+| **Vercel Dashboard** | https://vercel.com/glopresc/web |
+| **GitHub Repository** | https://github.com/glorino/talentflow-ai |
 
-| Service | Dashboard URL |
-|---------|---------------|
-| **Vercel** | https://vercel.com/dashboard |
-| **Neon PostgreSQL** | https://console.neon.tech |
-| **Clerk Auth** | https://dashboard.clerk.com |
-| **OpenAI** | https://platform.openai.com |
-| **Expo (Mobile)** | https://expo.dev |
-| **GitHub** | https://github.com/{org}/talentflow-ai |
+## 📱 Mobile Applications
+
+| Platform | Link |
+|----------|------|
+| **Expo Dashboard** | https://expo.dev (after EAS setup) |
+| **iOS Build** | Run: `cd apps/mobile && eas build --platform ios` |
+| **Android Build** | Run: `cd apps/mobile && eas build --platform android` |
 
 ## 🔗 API Endpoints
 
 ```
-Base URL:        https://app.talentflow.ai/api
+Production:  https://web-glopresc.vercel.app/api
 
-Employees:       GET/POST /api/employees
-AI Agents:       GET/POST /api/ai
-Workflows:       POST /api/ai/workflows/{workflowId}
-Company Stats:   GET /api/companies/{companyId}/stats
-Webhooks:        POST /api/webhooks/clerk
+GET  /api/employees          - List employees
+POST /api/employees          - Create employee
+GET  /api/ai                 - List AI agents
+POST /api/ai                 - Execute AI agent
+GET  /api/ai/workflows       - List workflows
+POST /api/ai/workflows/:id   - Execute workflow
+GET  /api/companies/:id/stats - Company stats
 ```
 
-## 🚀 Deployment Commands
+## 🔐 Authentication
 
-### Web (Vercel)
-```bash
-# First time setup
-npm i -g vercel
-vercel login
-vercel link
-vercel --prod
-```
+| Service | Dashboard URL |
+|---------|---------------|
+| **Clerk Dashboard** | https://dashboard.clerk.com |
+| **Webhook URL** | https://web-glopresc.vercel.app/api/webhooks/clerk |
 
-### Database (Neon)
-```bash
-npm run db:push
-npm run db:seed
-```
+## 🗄️ Database
 
-### Mobile (EAS)
-```bash
-cd apps/mobile
-npm install -g eas-cli
-eas login
-eas build:configure
-eas build --platform ios --profile production
-eas build --platform android --profile production
-```
+| Service | URL |
+|---------|-----|
+| **Neon Console** | https://console.neon.tech |
+| **Connect** | `postgresql://xxx@ep-xxx.us-east-2.aws.neon.tech/talentflow` |
 
-## 🔐 Required Environment Variables
+## 🔧 Environment Variables (Set in Vercel Dashboard)
 
 ```env
-# Database
-DATABASE_URL=postgresql://xxx@ep-xxx.us-east-2.aws.neon.tech/talentflow
-
-# Auth (Clerk)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
-CLERK_SECRET_KEY=sk_test_xxx
-CLERK_WEBHOOK_SECRET=whsec_xxx
-
-# AI (OpenAI)
-OPENAI_API_KEY=sk-xxx
-
-# Mobile
-EXPO_PUBLIC_API_URL=https://app.talentflow.ai
-EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
+DATABASE_URL=postgresql://...
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
+CLERK_SECRET_KEY=sk_...
+CLERK_WEBHOOK_SECRET=whsec_...
+OPENAI_API_KEY=sk-...
 ```
 
-## 📱 GitHub Actions Workflows
+## 📊 Pages Built
 
-| Workflow | Trigger | File |
-|----------|---------|------|
-| CI/CD | Push to main | `.github/workflows/ci.yml` |
-| Deploy Web | Push to main | `.github/workflows/deploy.yml` |
-| Build Mobile | Manual trigger | `.github/workflows/mobile.yml` |
-| DB Migration | Push to packages/database | `.github/workflows/migrate.yml` |
+| Page | URL | Status |
+|------|-----|--------|
+| Dashboard | /dashboard | ✅ Live |
+| Recruitment Jobs | /recruitment/jobs | ✅ Live |
+| AI Agent Dashboard | /ai/dashboard | ✅ Live |
+| API Health | /api/ai | ✅ Live |
 
-## 🎯 Quick Start Links
+## 🚀 GitHub Actions (CI/CD)
 
-```
-1. Clone:     git clone https://github.com/{org}/talentflow-ai.git
-2. Install:   cd talentflow-ai && npm install
-3. Setup:     cp .env.example .env (fill in keys)
-4. Database:  npm run db:push && npm run db:seed
-5. Dev:       npm run dev
-6. Deploy:    vercel --prod
-```
-
-## 📈 Scaling Targets
-
-| Metric | Current | Target |
-|--------|---------|--------|
-| Companies | 1 | 10,000 |
-| Employees | 4 | 1,000,000 |
-| Concurrent Users | - | 100,000 |
-| API Response Time | - | <200ms |
-| Uptime | - | 99.99% |
-
-## 🛠️ Tech Stack Summary
-
-- **Frontend:** Next.js 15, React 19, TypeScript, TailwindCSS
-- **Mobile:** React Native Expo SDK 52
-- **Database:** Neon PostgreSQL, Drizzle ORM
-- **Auth:** Clerk
-- **AI:** OpenAI GPT-4o, Agents SDK
-- **Hosting:** Vercel (Web), EAS (Mobile)
-- **CI/CD:** GitHub Actions
+| Workflow | Trigger |
+|----------|---------|
+| CI/CD | Push to main |
+| Deploy Web | Push to main |
+| Build Mobile | Manual trigger |
+| DB Migration | Push to packages/database |
