@@ -1,0 +1,31 @@
+{
+  "name": "talentflow-ai",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Enterprise AI-Powered HR Operating System",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/{owner}/talentflow-ai.git"
+  },
+  "homepage": "https://app.talentflow.ai",
+  "bugs": {
+    "url": "https://github.com/{owner}/talentflow-ai/issues"
+  },
+  "keywords": [
+    "hr",
+    "human-resources",
+    "ai",
+    "machine-learning",
+    "recruitment",
+    "payroll",
+    "employee-management",
+    "saas",
+    "nextjs",
+    "react-native"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

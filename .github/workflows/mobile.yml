@@ -1,0 +1,54 @@
+name: Build Mobile Apps
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - ios
+          - android
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Expo CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build iOS
+        if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'ios'
+        run: |
+          cd apps/mobile
+          eas build --platform ios --profile production --non-interactive
+
+      - name: Build Android
+        if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'android'
+        run: |
+          cd apps/mobile
+          eas build --platform android --profile production --non-interactive
+
+      - name: Summary
+        run: |
+          echo "## Mobile Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Platform:** ${{ github.event.inputs.platform }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ✅ Build started" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dashboard:** https://expo.dev" >> $GITHUB_STEP_SUMMARY
