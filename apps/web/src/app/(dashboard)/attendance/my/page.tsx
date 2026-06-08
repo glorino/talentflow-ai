@@ -34,10 +34,10 @@ const weeklySummary = [
 ];
 
 const stats = [
-  { label: "Present Today", value: "94.2%", change: "+0.8%", trend: "up", icon: Users, color: "text-emerald-600" },
-  { label: "Avg Hours/Day", value: "8.9h", change: "+0.2h", trend: "up", icon: Clock, color: "text-blue-600" },
-  { label: "Remote Workers", value: "23", change: "+3", trend: "up", icon: MapPin, color: "text-purple-600" },
-  { label: "Break Compliance", value: "98.5%", change: "+1.2%", trend: "up", icon: Coffee, color: "text-amber-600" },
+  { label: "Present Today", value: "94.2%", change: "+0.8%", trend: "up", icon: Users, color: "text-emerald-600", cardClass: "stat-card-emerald" },
+  { label: "Avg Hours/Day", value: "8.9h", change: "+0.2h", trend: "up", icon: Clock, color: "text-blue-600", cardClass: "stat-card-blue" },
+  { label: "Remote Workers", value: "23", change: "+3", trend: "up", icon: MapPin, color: "text-purple-600", cardClass: "stat-card-purple" },
+  { label: "Break Compliance", value: "98.5%", change: "+1.2%", trend: "up", icon: Coffee, color: "text-amber-600", cardClass: "stat-card-amber" },
 ];
 
 export default function AttendancePage() {
@@ -75,7 +75,7 @@ export default function AttendancePage() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="stat-card">
+            <div key={stat.label} className={cn(stat.cardClass || "stat-card")}>
               <div className="relative z-10">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>

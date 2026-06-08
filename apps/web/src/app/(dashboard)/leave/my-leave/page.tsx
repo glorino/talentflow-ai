@@ -88,10 +88,10 @@ const leaveRequests = [
 ];
 
 const leaveBalances = [
-  { type: "Annual Leave", icon: Plane, color: "text-blue-600", balance: 15, total: 20, used: 5 },
-  { type: "Sick Leave", icon: Stethoscope, color: "text-red-600", balance: 8, total: 10, used: 2 },
-  { type: "Personal Leave", icon: Heart, color: "text-purple-600", balance: 4, total: 5, used: 1 },
-  { type: "Study Leave", icon: GraduationCap, color: "text-emerald-600", balance: 3, total: 5, used: 2 },
+  { type: "Annual Leave", icon: Plane, color: "text-blue-600", cardClass: "stat-card-blue", balance: 15, total: 20, used: 5 },
+  { type: "Sick Leave", icon: Stethoscope, color: "text-red-600", cardClass: "stat-card-rose", balance: 8, total: 10, used: 2 },
+  { type: "Personal Leave", icon: Heart, color: "text-purple-600", cardClass: "stat-card-purple", balance: 4, total: 5, used: 1 },
+  { type: "Study Leave", icon: GraduationCap, color: "text-emerald-600", cardClass: "stat-card-emerald", balance: 3, total: 5, used: 2 },
 ];
 
 const typeIcons: Record<string, { icon: React.ElementType; color: string }> = {
@@ -134,7 +134,7 @@ export default function LeavePage() {
           const Icon = leave.icon;
           const percentage = ((leave.total - leave.balance) / leave.total) * 100;
           return (
-            <div key={leave.type} className="card-enterprise p-5">
+            <div key={leave.type} className={cn(leave.cardClass || "card-enterprise", "p-5")}>
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-muted-foreground">{leave.type}</p>
                 <Icon size={16} className={leave.color} />

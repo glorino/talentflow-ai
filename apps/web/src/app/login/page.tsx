@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Sparkles,
   Eye,
@@ -23,9 +23,16 @@ const features = [
   { icon: BarChart3, title: "Real-time Analytics", desc: "Make data-driven HR decisions" },
 ];
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isRegister, setIsRegister] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("mode") === "register") {
+      setIsRegister(true);
+    }
+  }, [searchParams]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -290,5 +297,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

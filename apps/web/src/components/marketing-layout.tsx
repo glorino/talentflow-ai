@@ -18,6 +18,9 @@ const navLinks = [
   { href: "/features", label: "Features" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
+  { href: "/careers", label: "Careers" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function MarketingLayout({
@@ -142,9 +145,15 @@ export default function MarketingLayout({
             <div>
               <h3 className="text-sm font-semibold mb-4">Product</h3>
               <ul className="space-y-2.5">
-                {["Features", "Pricing", "Integrations", "API Docs", "Changelog"].map((item) => (
-                  <li key={item}>
-                    <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{item}</Link>
+                {[
+                  { label: "Features", href: "/features" },
+                  { label: "Pricing", href: "/pricing" },
+                  { label: "Integrations", href: "/features" },
+                  { label: "API Docs", href: "/features" },
+                  { label: "Changelog", href: "/blog" },
+                ].map((item) => (
+                  <li key={item.label}>
+                    <Link href={item.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{item.label}</Link>
                   </li>
                 ))}
               </ul>
@@ -153,9 +162,14 @@ export default function MarketingLayout({
             <div>
               <h3 className="text-sm font-semibold mb-4">Company</h3>
               <ul className="space-y-2.5">
-                {["About", "Blog", "Careers", "Press Kit", "Contact"].map((item) => (
-                  <li key={item}>
-                    <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{item}</Link>
+                {[
+                  { label: "About", href: "/about" },
+                  { label: "Blog", href: "/blog" },
+                  { label: "Careers", href: "/careers" },
+                  { label: "Contact", href: "/contact" },
+                ].map((item) => (
+                  <li key={item.label}>
+                    <Link href={item.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{item.label}</Link>
                   </li>
                 ))}
               </ul>

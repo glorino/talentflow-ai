@@ -32,6 +32,7 @@ const stats = [
     icon: Users,
     color: "from-blue-500 to-blue-600",
     bg: "bg-blue-50",
+    cardClass: "stat-card-blue",
     sparkline: [40, 45, 42, 50, 48, 55, 52, 60, 58, 65],
   },
   {
@@ -42,6 +43,7 @@ const stats = [
     icon: Briefcase,
     color: "from-purple-500 to-purple-600",
     bg: "bg-purple-50",
+    cardClass: "stat-card-purple",
     sparkline: [20, 22, 25, 23, 28, 30, 27, 32, 34, 34],
   },
   {
@@ -52,6 +54,7 @@ const stats = [
     icon: Calendar,
     color: "from-amber-500 to-orange-500",
     bg: "bg-amber-50",
+    cardClass: "stat-card-amber",
     sparkline: [30, 28, 25, 22, 20, 18, 19, 17, 18, 18],
   },
   {
@@ -62,6 +65,7 @@ const stats = [
     icon: Clock,
     color: "from-emerald-500 to-emerald-600",
     bg: "bg-emerald-50",
+    cardClass: "stat-card-emerald",
     sparkline: [90, 91, 92, 91, 93, 92, 94, 93, 94, 94],
   },
 ];
@@ -256,7 +260,7 @@ export default function DashboardPage() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.title} className="stat-card group cursor-pointer">
+            <div key={stat.title} className={cn(stat.cardClass || "stat-card", "group cursor-pointer")}>
               <div className="relative z-10">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>

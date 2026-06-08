@@ -40,10 +40,10 @@ const employees = [
 ];
 
 const stats = [
-  { label: "Total Employees", value: "1,247", change: "+12%", trend: "up", icon: Users, color: "text-blue-600" },
-  { label: "Active", value: "1,198", change: "96.1%", trend: "up", icon: UserCheck, color: "text-emerald-600" },
-  { label: "On Leave", value: "34", change: "2.7%", trend: "down", icon: UserCog, color: "text-amber-600" },
-  { label: "New This Month", value: "18", change: "+5", trend: "up", icon: UserPlus, color: "text-purple-600" },
+  { label: "Total Employees", value: "1,247", change: "+12%", trend: "up", icon: Users, color: "text-blue-600", cardClass: "stat-card-blue" },
+  { label: "Active", value: "1,198", change: "96.1%", trend: "up", icon: UserCheck, color: "text-emerald-600", cardClass: "stat-card-emerald" },
+  { label: "On Leave", value: "34", change: "2.7%", trend: "down", icon: UserCog, color: "text-amber-600", cardClass: "stat-card-amber" },
+  { label: "New This Month", value: "18", change: "+5", trend: "up", icon: UserPlus, color: "text-purple-600", cardClass: "stat-card-purple" },
 ];
 
 export default function EmployeeDirectoryPage() {
@@ -86,7 +86,7 @@ export default function EmployeeDirectoryPage() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="stat-card group cursor-pointer">
+            <div key={stat.label} className={cn(stat.cardClass || "stat-card", "group cursor-pointer")}>
               <div className="relative z-10">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>

@@ -108,10 +108,10 @@ const statusConfig: Record<string, { label: string; class: string; icon: React.E
 };
 
 const stats = [
-  { label: "Total Payroll", value: "$2.4M", change: "+8.2%", trend: "up", icon: DollarSign, color: "text-blue-600" },
-  { label: "Avg Salary", value: "$134K", change: "+3.1%", trend: "up", icon: Wallet, color: "text-emerald-600" },
-  { label: "Total Bonuses", value: "$100.5K", change: "+12%", trend: "up", icon: TrendingUp, color: "text-purple-600" },
-  { label: "Total Deductions", value: "$29.9K", change: "+2.1%", trend: "up", icon: Receipt, color: "text-amber-600" },
+  { label: "Total Payroll", value: "$2.4M", change: "+8.2%", trend: "up", icon: DollarSign, color: "text-blue-600", cardClass: "stat-card-blue" },
+  { label: "Avg Salary", value: "$134K", change: "+3.1%", trend: "up", icon: Wallet, color: "text-emerald-600", cardClass: "stat-card-emerald" },
+  { label: "Total Bonuses", value: "$100.5K", change: "+12%", trend: "up", icon: TrendingUp, color: "text-purple-600", cardClass: "stat-card-purple" },
+  { label: "Total Deductions", value: "$29.9K", change: "+2.1%", trend: "up", icon: Receipt, color: "text-amber-600", cardClass: "stat-card-amber" },
 ];
 
 export default function PayrollPage() {
@@ -146,7 +146,7 @@ export default function PayrollPage() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="stat-card">
+            <div key={stat.label} className={cn(stat.cardClass || "stat-card")}>
               <div className="relative z-10">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
