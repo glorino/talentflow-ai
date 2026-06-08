@@ -30,7 +30,6 @@ export default function MarketingLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
@@ -81,7 +80,6 @@ export default function MarketingLayout({
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {mobileOpen && (
           <div className="border-t md:hidden animate-slide-up">
             <div className="space-y-1 px-6 py-4">
@@ -96,18 +94,10 @@ export default function MarketingLayout({
                 </Link>
               ))}
               <div className="border-t pt-4 mt-4 space-y-2">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
-                >
+                <Link href="/login" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted">
                   Sign In
                 </Link>
-                <Link
-                  href="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="block rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-medium text-primary-foreground"
-                >
+                <Link href="/login" onClick={() => setMobileOpen(false)} className="block rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-medium text-primary-foreground">
                   Get Started Free
                 </Link>
               </div>
@@ -116,10 +106,8 @@ export default function MarketingLayout({
         )}
       </header>
 
-      {/* Content */}
       <main>{children}</main>
 
-      {/* Footer */}
       <footer className="border-t bg-muted/30">
         <div className="mx-auto max-w-7xl px-6 py-16">
           <div className="grid gap-12 md:grid-cols-5">
@@ -134,7 +122,6 @@ export default function MarketingLayout({
               </Link>
               <p className="text-sm text-muted-foreground max-w-sm">
                 The AI-powered HR operating system that automates recruitment, payroll, compliance, and more.
-                Built for modern enterprises.
               </p>
               <div className="mt-6 flex items-center gap-4">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -143,7 +130,7 @@ export default function MarketingLayout({
                 </div>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Shield size={14} className="text-emerald-500" />
-                  SOC2 Compliant
+                  SOC2
                 </div>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Zap size={14} className="text-amber-500" />
@@ -157,9 +144,7 @@ export default function MarketingLayout({
               <ul className="space-y-2.5">
                 {["Features", "Pricing", "Integrations", "API Docs", "Changelog"].map((item) => (
                   <li key={item}>
-                    <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                      {item}
-                    </Link>
+                    <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{item}</Link>
                   </li>
                 ))}
               </ul>
@@ -170,9 +155,7 @@ export default function MarketingLayout({
               <ul className="space-y-2.5">
                 {["About", "Blog", "Careers", "Press Kit", "Contact"].map((item) => (
                   <li key={item}>
-                    <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                      {item}
-                    </Link>
+                    <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{item}</Link>
                   </li>
                 ))}
               </ul>
@@ -183,9 +166,7 @@ export default function MarketingLayout({
               <ul className="space-y-2.5">
                 {["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR", "Security"].map((item) => (
                   <li key={item}>
-                    <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                      {item}
-                    </Link>
+                    <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{item}</Link>
                   </li>
                 ))}
               </ul>

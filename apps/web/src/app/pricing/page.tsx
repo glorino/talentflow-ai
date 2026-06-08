@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import MarketingLayout from "@/components/marketing-layout";
 import {
   CheckCircle2,
   ArrowRight,
@@ -105,7 +106,7 @@ const faqs = [
 
 export default function PricingPage() {
   return (
-    <div className="overflow-hidden">
+    <MarketingLayout>
       {/* Hero */}
       <section className="py-24 bg-gradient-to-br from-slate-50 via-white to-blue-50">
         <div className="mx-auto max-w-7xl px-6 text-center">
@@ -116,7 +117,6 @@ export default function PricingPage() {
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
             Simple, transparent
             <span className="text-primary"> pricing</span>
-         1
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
             Choose the plan that fits your team. All plans include AI agents, core HR features,
@@ -253,6 +253,6 @@ export default function PricingPage() {
           </Link>
         </div>
       </section>
-    </div>
+    </MarketingLayout>
   );
 }

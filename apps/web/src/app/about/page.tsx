@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import MarketingLayout from "@/components/marketing-layout";
 import {
   ArrowRight,
   Sparkles,
@@ -40,7 +41,7 @@ const milestones = [
 
 export default function AboutPage() {
   return (
-    <div className="overflow-hidden">
+    <MarketingLayout>
       {/* Hero */}
       <section className="py-24 bg-gradient-to-br from-slate-50 via-white to-blue-50">
         <div className="mx-auto max-w-7xl px-6">
@@ -218,6 +219,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-    </div>
+    </MarketingLayout>
   );
 }
