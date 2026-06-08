@@ -1,16 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Users,
-  UserCheck,
   Briefcase,
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  AlertTriangle,
-  Clock,
   Calendar,
+  Clock,
+  TrendingUp,
   Brain,
   Sparkles,
   ArrowRight,
@@ -22,6 +18,8 @@ import {
   Target,
   Eye,
   RefreshCw,
+  Plus,
+  Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -73,8 +71,7 @@ const aiInsights = [
     id: 1,
     type: "risk",
     title: "Retention Risk Alert",
-    description:
-      "3 senior engineers show disengagement signals. Flight risk: 87%. Recommend 1:1 check-ins within 48 hours.",
+    description: "3 senior engineers show disengagement signals. Flight risk: 87%. Recommend 1:1 check-ins within 48 hours.",
     confidence: 87,
     priority: "high",
     impact: "High",
@@ -85,120 +82,58 @@ const aiInsights = [
     id: 2,
     type: "hiring",
     title: "Hiring Pipeline Bottleneck",
-    description:
-      "Full Stack Developer role stalled at interview stage for 14 days. 12 candidates waiting. Consider adding interview slots.",
+    description: "Full Stack Developer role stalled at interview stage for 14 days. 12 candidates waiting.",
     confidence: 92,
     priority: "high",
     impact: "Medium",
     agents: ["Recruitment", "Interview"],
-    actions: ["Add interview slots", "Reassign interviewer", "Send updates"],
+    actions: ["Add interview slots", "Reassign interviewer"],
   },
   {
     id: 3,
     type: "compliance",
     title: "Training Gap Detected",
-    description:
-      "47 employees (18%) haven't completed mandatory cybersecurity training. Deadline: Jun 30.",
+    description: "47 employees (18%) haven't completed mandatory cybersecurity training. Deadline: Jun 30.",
     confidence: 95,
     priority: "medium",
     impact: "High",
     agents: ["Compliance", "Learning"],
-    actions: ["Send reminders", "Block access", "Escalate to manager"],
+    actions: ["Send reminders", "Block access"],
   },
   {
     id: 4,
     type: "payroll",
     title: "Overtime Cost Spike",
-    description:
-      "Sales department overtime increased 22% month-over-month. 8 employees over 20hrs OT. Review workload distribution.",
+    description: "Sales department overtime increased 22% month-over-month. 8 employees over 20hrs OT.",
     confidence: 89,
     priority: "medium",
     impact: "Medium",
     agents: ["Payroll"],
-    actions: ["View breakdown", "Contact managers", "Set alerts"],
+    actions: ["View breakdown", "Contact managers"],
   },
 ];
 
 const recentActivity = [
-  {
-    type: "hire",
-    user: "Sarah Chen",
-    action: "accepted offer for Senior Engineer",
-    time: "2 hours ago",
-    avatar: "SC",
-    color: "bg-emerald-500",
-  },
-  {
-    type: "leave",
-    user: "James Wilson",
-    action: "requested 5 days annual leave",
-    time: "3 hours ago",
-    avatar: "JW",
-    color: "bg-blue-500",
-  },
-  {
-    type: "performance",
-    user: "Q1 Reviews",
-    action: "initiated for Engineering (23 people)",
-    time: "5 hours ago",
-    avatar: "Q1",
-    color: "bg-purple-500",
-  },
-  {
-    type: "compliance",
-    user: "Training",
-    action: "deadline in 14 days for 47 employees",
-    time: "6 hours ago",
-    avatar: "CT",
-    color: "bg-amber-500",
-  },
-  {
-    type: "payroll",
-    user: "May Payroll",
-    action: "processed successfully ($2.4M)",
-    time: "1 day ago",
-    avatar: "MP",
-    color: "bg-emerald-500",
-  },
+  { user: "Sarah Chen", action: "accepted offer for Senior Engineer", time: "2 hours ago", avatar: "SC", color: "bg-emerald-500" },
+  { user: "James Wilson", action: "requested 5 days annual leave", time: "3 hours ago", avatar: "JW", color: "bg-blue-500" },
+  { user: "Q1 Reviews", action: "initiated for Engineering (23 people)", time: "5 hours ago", avatar: "Q1", color: "bg-purple-500" },
+  { user: "Training", action: "deadline in 14 days for 47 employees", time: "6 hours ago", avatar: "CT", color: "bg-amber-500" },
+  { user: "May Payroll", action: "processed successfully ($2.4M)", time: "1 day ago", avatar: "MP", color: "bg-emerald-500" },
 ];
 
 const upcomingEvents = [
-  {
-    event: "Q2 Performance Review",
-    date: "Jun 30",
-    daysLeft: 23,
-    icon: Target,
-    color: "text-blue-600",
-  },
-  {
-    event: "Payroll Processing",
-    date: "Jun 15",
-    daysLeft: 8,
-    icon: DollarSign,
-    color: "text-emerald-600",
-  },
-  {
-    event: "All-Hands Meeting",
-    date: "Jun 10",
-    daysLeft: 3,
-    icon: Users,
-    color: "text-purple-600",
-  },
-  {
-    event: "Compliance Training Due",
-    date: "Jun 30",
-    daysLeft: 23,
-    icon: AlertTriangle,
-    color: "text-amber-600",
-  },
+  { event: "Q2 Performance Review", date: "Jun 30", daysLeft: 23, icon: Target, color: "text-blue-600" },
+  { event: "Payroll Processing", date: "Jun 15", daysLeft: 8, icon: Clock, color: "text-emerald-600" },
+  { event: "All-Hands Meeting", date: "Jun 10", daysLeft: 3, icon: Users, color: "text-purple-600" },
+  { event: "Compliance Training Due", date: "Jun 30", daysLeft: 23, icon: Calendar, color: "text-amber-600" },
 ];
 
 const teamMetrics = [
-  { name: "Engineering", headcount: 342, hiring: 8, turnover: "4.2%", satisfaction: 88 },
-  { name: "Sales", headcount: 256, hiring: 5, turnover: "7.1%", satisfaction: 82 },
-  { name: "Marketing", headcount: 89, hiring: 2, turnover: "3.8%", satisfaction: 91 },
-  { name: "Operations", headcount: 178, hiring: 3, turnover: "5.5%", satisfaction: 85 },
-  { name: "Finance", headcount: 67, hiring: 1, turnover: "2.1%", satisfaction: 89 },
+  { name: "Engineering", headcount: 342, hiring: 8, turnover: "4.2%", satisfaction: 88, color: "bg-blue-500" },
+  { name: "Sales", headcount: 256, hiring: 5, turnover: "7.1%", satisfaction: 82, color: "bg-purple-500" },
+  { name: "Marketing", headcount: 89, hiring: 2, turnover: "3.8%", satisfaction: 91, color: "bg-emerald-500" },
+  { name: "Operations", headcount: 178, hiring: 3, turnover: "5.5%", satisfaction: 85, color: "bg-amber-500" },
+  { name: "Finance", headcount: 67, hiring: 1, turnover: "2.1%", satisfaction: 89, color: "bg-teal-500" },
 ];
 
 function MiniSparkline({ data, color }: { data: number[]; color: string }) {
@@ -210,11 +145,21 @@ function MiniSparkline({ data, color }: { data: number[]; color: string }) {
     .join(" ");
 
   return (
-    <svg viewBox="0 0 100 100" className="sparkline" preserveAspectRatio="none">
+    <svg viewBox="0 0 100 100" className="h-8 w-16" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id={`grad-${color.replace(/[^a-z]/g, '')}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <polygon
+        fill={`url(#grad-${color.replace(/[^a-z]/g, '')})`}
+        points={`0,100 ${points} 100,100`}
+      />
       <polyline
         fill="none"
         stroke={color}
-        strokeWidth="2"
+        strokeWidth="2.5"
         points={points}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -223,9 +168,68 @@ function MiniSparkline({ data, color }: { data: number[]; color: string }) {
   );
 }
 
+function AnimatedCounter({ value, duration = 2000 }: { value: string; duration?: number }) {
+  const [displayValue, setDisplayValue] = useState("0");
+
+  useEffect(() => {
+    const numericValue = parseInt(value.replace(/[^0-9]/g, ""));
+    if (isNaN(numericValue)) {
+      setDisplayValue(value);
+      return;
+    }
+
+    let start = 0;
+    const end = numericValue;
+    const startTime = Date.now();
+
+    function animate() {
+      const now = Date.now();
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(start + (end - start) * eased);
+
+      if (value.includes(",")) {
+        setDisplayValue(current.toLocaleString());
+      } else if (value.includes("%")) {
+        setDisplayValue(((current / 100) * 100).toFixed(1) + "%");
+      } else {
+        setDisplayValue(String(current));
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }, [value, duration]);
+
+  return <span>{displayValue}</span>;
+}
+
 export default function DashboardPage() {
   const [aiMessage, setAiMessage] = useState("");
   const [showChat, setShowChat] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{ role: string; text: string }[]>([
+    { role: "ai", text: "Hello! I'm your AI HR Assistant. I can help with employee insights, compliance status, payroll questions, and more. What would you like to know?" },
+  ]);
+
+  const handleSendMessage = () => {
+    if (!aiMessage.trim()) return;
+    const userMsg = aiMessage;
+    setChatMessages((prev) => [...prev, { role: "user", text: userMsg }]);
+    setAiMessage("");
+
+    setTimeout(() => {
+      const responses = [
+        "Based on current data, I recommend prioritizing the 3 retention risk cases in Engineering. Want me to draft outreach emails?",
+        "Payroll is on track for Jun 15. Total: $2.4M for 1,247 employees. No anomalies detected.",
+        "Compliance training completion is at 82%. I've identified 47 employees who need reminders. Should I send them now?",
+        "Hiring velocity is 8 days above target. The bottleneck is in technical interviews. I suggest adding 2 more interview slots.",
+      ];
+      setChatMessages((prev) => [...prev, { role: "ai", text: responses[Math.floor(Math.random() * responses.length)] }]);
+    }, 1000);
+  };
 
   return (
     <div className="space-y-6">
@@ -233,9 +237,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Good afternoon, Admin</h1>
-          <p className="text-muted-foreground">
-            Here&apos;s what&apos;s happening across your organization today.
-          </p>
+          <p className="text-muted-foreground">Here&apos;s what&apos;s happening across your organization today.</p>
         </div>
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted">
@@ -249,22 +251,24 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stat Cards with Sparklines */}
+      {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.title} className="stat-card group">
+            <div key={stat.title} className="stat-card group cursor-pointer">
               <div className="relative z-10">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                  <div className={cn("rounded-lg p-2", stat.bg)}>
+                  <div className={cn("rounded-lg p-2 transition-transform group-hover:scale-110", stat.bg)}>
                     <Icon size={18} className={stat.color.split(" ")[0].replace("from-", "text-")} />
                   </div>
                 </div>
                 <div className="mt-3 flex items-end justify-between">
                   <div>
-                    <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+                    <p className="text-3xl font-bold tracking-tight">
+                      <AnimatedCounter value={stat.value} />
+                    </p>
                     <p className={cn(
                       "mt-1 flex items-center gap-1 text-xs font-medium",
                       stat.trend === "up" ? "text-emerald-600" : "text-red-600"
@@ -273,7 +277,7 @@ export default function DashboardPage() {
                       {stat.change}
                     </p>
                   </div>
-                  <MiniSparkline data={stat.sparkline} color="hsl(var(--primary))" />
+                  <MiniSparkline data={stat.sparkline} color={stat.trend === "up" ? "#10b981" : "#ef4444"} />
                 </div>
               </div>
             </div>
@@ -281,7 +285,7 @@ export default function DashboardPage() {
         })}
       </div>
 
-      {/* AI Insights Section - Workday-style cards */}
+      {/* AI Insights */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -289,32 +293,25 @@ export default function DashboardPage() {
               <Brain size={16} className="text-white" />
             </div>
             <h2 className="text-lg font-semibold">AI-Powered Insights</h2>
+            <span className="badge badge-info">Live</span>
           </div>
           <button className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            View all insights <ChevronRight size={14} />
+            View all <ChevronRight size={14} />
           </button>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2 stagger-children">
           {aiInsights.map((insight) => (
-            <div
-              key={insight.id}
-              className={cn("ai-insight-card p-5", insight.priority)}
-            >
+            <div key={insight.id} className={cn("ai-insight-card p-5", insight.priority)}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold">{insight.title}</h3>
-                    <span className={cn(
-                      "badge",
-                      insight.priority === "high" ? "badge-danger" : "badge-warning"
-                    )}>
+                    <span className={cn("badge", insight.priority === "high" ? "badge-danger" : "badge-warning")}>
                       {insight.priority}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {insight.description}
-                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{insight.description}</p>
                   <div className="mt-3 flex items-center gap-2">
                     {insight.agents.map((agent) => (
                       <span key={agent} className="badge badge-info">
@@ -336,7 +333,7 @@ export default function DashboardPage() {
                 {insight.actions.map((action) => (
                   <button
                     key={action}
-                    className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
+                    className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all hover:bg-primary hover:text-primary-foreground"
                   >
                     {action}
                     <ArrowRight size={10} />
@@ -350,67 +347,40 @@ export default function DashboardPage() {
 
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Team Performance - Workday-style data table */}
+        {/* Department Overview */}
         <div className="lg:col-span-2 card-enterprise">
           <div className="border-b px-6 py-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold">Department Overview</h2>
-              <button className="text-sm font-medium text-primary hover:underline">
-                View All
-              </button>
+              <button className="text-sm font-medium text-primary hover:underline">View All</button>
             </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Department</th>
-                  <th>Headcount</th>
-                  <th>Open Roles</th>
-                  <th>Turnover</th>
-                  <th>Satisfaction</th>
-                </tr>
-              </thead>
-              <tbody>
-                {teamMetrics.map((dept) => (
-                  <tr key={dept.name}>
-                    <td>
-                      <span className="font-medium">{dept.name}</span>
-                    </td>
-                    <td>{dept.headcount}</td>
-                    <td>
-                      <span className="badge badge-info">{dept.hiring}</span>
-                    </td>
-                    <td>
-                      <span className={cn(
-                        "font-medium",
-                        parseFloat(dept.turnover) > 6 ? "text-red-600" : "text-emerald-600"
-                      )}>
-                        {dept.turnover}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-2">
-                        <div className="progress-bar w-20">
-                          <div
-                            className={cn(
-                              "progress-bar-fill",
-                              dept.satisfaction >= 90
-                                ? "bg-emerald-500"
-                                : dept.satisfaction >= 80
-                                  ? "bg-blue-500"
-                                  : "bg-amber-500"
-                            )}
-                            style={{ width: `${dept.satisfaction}%` }}
-                          />
-                        </div>
-                        <span className="text-sm font-medium">{dept.satisfaction}%</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="p-6 space-y-4">
+            {teamMetrics.map((dept) => (
+              <div key={dept.name} className="flex items-center gap-4">
+                <div className={cn("h-2 w-2 rounded-full", dept.color)} />
+                <span className="w-28 text-sm font-medium">{dept.name}</span>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                    <span>{dept.headcount} employees</span>
+                    <span>{dept.satisfaction}% satisfaction</span>
+                  </div>
+                  <div className="progress-bar">
+                    <div
+                      className={cn("progress-bar-fill", dept.color)}
+                      style={{ width: `${dept.satisfaction}%` }}
+                    />
+                  </div>
+                </div>
+                <span className="w-16 text-right text-sm font-medium">{dept.hiring} hiring</span>
+                <span className={cn(
+                  "w-16 text-right text-sm font-medium",
+                  parseFloat(dept.turnover) > 6 ? "text-red-600" : "text-emerald-600"
+                )}>
+                  {dept.turnover}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -423,10 +393,7 @@ export default function DashboardPage() {
               {upcomingEvents.map((event) => {
                 const Icon = event.icon;
                 return (
-                  <div
-                    key={event.event}
-                    className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50"
-                  >
+                  <div key={event.event} className="flex items-center gap-3 rounded-lg border p-3 transition-all hover:bg-muted/50 hover:shadow-sm cursor-pointer">
                     <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg bg-muted", event.color)}>
                       <Icon size={16} />
                     </div>
@@ -436,11 +403,7 @@ export default function DashboardPage() {
                     </div>
                     <span className={cn(
                       "rounded-full px-2 py-0.5 text-xs font-semibold",
-                      event.daysLeft <= 7
-                        ? "bg-red-50 text-red-700"
-                        : event.daysLeft <= 14
-                          ? "bg-amber-50 text-amber-700"
-                          : "bg-emerald-50 text-emerald-700"
+                      event.daysLeft <= 7 ? "bg-red-50 text-red-700" : event.daysLeft <= 14 ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"
                     )}>
                       {event.daysLeft}d
                     </span>
@@ -450,14 +413,14 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Recent Activity - BambooHR style with avatars */}
+          {/* Recent Activity */}
           <div className="card-enterprise p-5">
             <h2 className="mb-4 font-semibold">Recent Activity</h2>
             <div className="space-y-4">
               {recentActivity.map((activity, i) => (
-                <div key={i} className="flex items-start gap-3">
+                <div key={i} className="flex items-start gap-3 group cursor-pointer">
                   <div className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold text-white",
+                    "flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold text-white transition-transform group-hover:scale-110",
                     activity.color
                   )}>
                     {activity.avatar}
@@ -476,38 +439,53 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* AI Copilot Floating Button */}
+      {/* AI Copilot FAB */}
       <button
         onClick={() => setShowChat(!showChat)}
-        className="ai-fab"
+        className={cn(
+          "fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 hover:scale-110",
+          showChat
+            ? "bg-muted text-foreground shadow-lg"
+            : "bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/30"
+        )}
+        style={!showChat ? { animation: "pulse-glow 3s ease-in-out infinite" } : undefined}
       >
-        <MessageSquare size={24} />
+        {showChat ? <ChevronRight size={24} /> : <MessageSquare size={24} />}
       </button>
 
       {/* AI Chat Panel */}
       {showChat && (
         <div className="fixed bottom-24 right-6 z-50 w-96 animate-scale-in">
-          <div className="card-enterprise shadow-2xl">
-            <div className="flex items-center gap-3 border-b p-4">
+          <div className="card-enterprise shadow-2xl overflow-hidden">
+            <div className="flex items-center gap-3 border-b p-4 bg-gradient-to-r from-primary/5 to-accent/5">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
                 <Sparkles size={16} className="text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h3 className="font-semibold">AI HR Assistant</h3>
-                <p className="text-xs text-muted-foreground">Ask me anything about your workforce</p>
+                <p className="text-xs text-emerald-600 flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Online
+                </p>
               </div>
             </div>
-            <div className="h-64 overflow-y-auto p-4">
-              <div className="space-y-4">
-                <div className="flex gap-3">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                    <Sparkles size={12} className="text-primary" />
-                  </div>
-                  <div className="rounded-lg rounded-tl-none bg-muted p-3 text-sm">
-                    Hello! I can help you with employee insights, compliance status, payroll questions, and more. What would you like to know?
+            <div className="h-72 overflow-y-auto p-4 space-y-4">
+              {chatMessages.map((msg, i) => (
+                <div key={i} className={cn("flex gap-3", msg.role === "user" && "flex-row-reverse")}>
+                  {msg.role === "ai" && (
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      <Sparkles size={12} className="text-primary" />
+                    </div>
+                  )}
+                  <div className={cn(
+                    "rounded-2xl px-4 py-2.5 text-sm max-w-[80%]",
+                    msg.role === "user"
+                      ? "bg-primary text-primary-foreground rounded-br-sm"
+                      : "bg-muted rounded-bl-sm"
+                  )}>
+                    {msg.text}
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
             <div className="border-t p-4">
               <div className="flex gap-2">
@@ -516,17 +494,22 @@ export default function DashboardPage() {
                   placeholder="Ask about your workforce..."
                   value={aiMessage}
                   onChange={(e) => setAiMessage(e.target.value)}
-                  className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                  className="flex-1 rounded-xl border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
-                <button className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                  Ask
+                <button
+                  onClick={handleSendMessage}
+                  className="rounded-xl bg-primary p-2.5 text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  <Send size={16} />
                 </button>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                {["Who's at risk of leaving?", "Show payroll summary", "Compliance status"].map((q) => (
+                {["Who's at risk?", "Payroll summary", "Compliance status"].map((q) => (
                   <button
                     key={q}
-                    className="rounded-full border px-3 py-1 text-xs text-muted-foreground hover:bg-muted"
+                    onClick={() => { setAiMessage(q); }}
+                    className="rounded-full border px-3 py-1 text-xs text-muted-foreground hover:bg-muted transition-colors"
                   >
                     {q}
                   </button>
