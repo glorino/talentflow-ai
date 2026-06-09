@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import MarketingLayout from "@/components/marketing-layout";
 import {
@@ -9,17 +10,27 @@ import {
   Zap,
   Building2,
   Users,
+  CreditCard,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+declare global {
+  interface Window {
+    FlutterwaveCheckout?: (config: Record<string, unknown>) => void;
+  }
+}
+
 const plans = [
   {
+    id: "starter",
     name: "Starter",
     description: "For small teams getting started",
     price: 9,
     period: "per employee/month",
     icon: Users,
     color: "from-blue-500 to-blue-600",
+    cardClass: "card-blue",
     popular: false,
     features: [
       "Up to 50 employees",
@@ -33,12 +44,14 @@ const plans = [
     cta: "Start Free Trial",
   },
   {
+    id: "professional",
     name: "Professional",
     description: "For growing companies",
     price: 19,
     period: "per employee/month",
     icon: Zap,
     color: "from-purple-500 to-purple-600",
+    cardClass: "card-purple",
     popular: true,
     features: [
       "Up to 500 employees",
@@ -54,12 +67,14 @@ const plans = [
     cta: "Start Free Trial",
   },
   {
+    id: "enterprise",
     name: "Enterprise",
     description: "For large organizations",
     price: 39,
     period: "per employee/month",
     icon: Building2,
     color: "from-amber-500 to-orange-500",
+    cardClass: "card-amber",
     popular: false,
     features: [
       "Unlimited employees",
@@ -88,7 +103,7 @@ const faqs = [
   },
   {
     q: "What payment methods do you accept?",
-    a: "We accept all major credit cards, ACH transfers, and wire transfers for Enterprise plans.",
+    a: "We accept all major credit cards via Flutterwave, supporting Visa, Mastercard, Vodafone MTN, and bank transfers across 30+ countries.",
   },
   {
     q: "Is my data secure?",
@@ -105,6 +120,92 @@ const faqs = [
 ];
 
 export default function PricingPage() {
+  const [loading, setLoading] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.flutterwave.com/js/flutterwave.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  function handleSubscribe(planId: string) {
+    const plan = plans.find((p) => p.id === planId);
+    if (!plan || plan.id === "enterprise") return;
+    setSelectedPlan(planId);
+    setShowModal(true);
+    setError("");
+  }
+
+  async function handleCheckout() {
+    if (!selectedPlan || !email || !name) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setLoading(selectedPlan);
+    setError("");
+
+    try {
+      const res = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: selectedPlan,
+          email,
+          name,
+          companyId: "00000000-0000-0000-0000-000000000001",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        setError(data.error || "Failed to initialize payment");
+        setLoading(null);
+        return;
+      }
+
+      if (window.FlutterwaveCheckout) {
+        window.FlutterwaveCheckout({
+          public_key: process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY!,
+          tx_ref: data.data.txRef,
+          amount: data.data.amount,
+          currency: "USD",
+          payment_options: "card,banktransfer,ussd",
+          redirect_url: `${window.location.origin}/api/billing/verify`,
+          customer: { email, name },
+          customizations: {
+            title: "TalentFlow AI",
+            description: `${selectedPlan?.charAt(0).toUpperCase()}${selectedPlan?.slice(1)} Plan Subscription`,
+            logo: "https://web-glopresc.vercel.app/favicon.ico",
+          },
+          meta: [
+            { company_id: "00000000-0000-0000-0000-000000000001", plan: selectedPlan },
+          ],
+        });
+      } else {
+        window.open(data.data.paymentLink, "_blank");
+      }
+
+      setShowModal(false);
+      setEmail("");
+      setName("");
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(null);
+    }
+  }
+
   return (
     <MarketingLayout>
       {/* Hero */}
@@ -153,18 +254,42 @@ export default function PricingPage() {
                     <span className="text-4xl font-bold">${plan.price}</span>
                     <span className="text-muted-foreground">/{plan.period}</span>
                   </div>
-                  <Link
-                    href="/login"
-                    className={cn(
-                      "flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all w-full",
-                      plan.popular
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "border bg-background hover:bg-muted"
-                    )}
-                  >
-                    {plan.cta}
-                    <ArrowRight size={14} />
-                  </Link>
+                  {plan.id === "enterprise" ? (
+                    <Link
+                      href="/contact"
+                      className={cn(
+                        "flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all w-full",
+                        "border bg-background hover:bg-muted"
+                      )}
+                    >
+                      {plan.cta}
+                      <ArrowRight size={14} />
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => handleSubscribe(plan.id)}
+                      disabled={loading !== null}
+                      className={cn(
+                        "flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all w-full",
+                        plan.popular
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "border bg-background hover:bg-muted",
+                        loading === plan.id && "opacity-70 cursor-not-allowed"
+                      )}
+                    >
+                      {loading === plan.id ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          {plan.cta}
+                          <CreditCard size={14} />
+                        </>
+                      )}
+                    </button>
+                  )}
                   <div className="mt-8 space-y-3">
                     {plan.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-3">
@@ -244,15 +369,79 @@ export default function PricingPage() {
           <p className="text-lg text-blue-100 mb-8">
             Start your 14-day free trial today. No credit card required.
           </p>
-          <Link
-            href="/login"
+          <button
+            onClick={() => handleSubscribe("professional")}
             className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-base font-semibold text-blue-600 shadow-lg transition-all hover:shadow-xl hover:scale-105"
           >
             Start Free Trial
             <ArrowRight size={18} />
-          </Link>
+          </button>
         </div>
       </section>
+
+      {/* Checkout Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-card rounded-2xl border shadow-2xl p-8 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold">Subscribe to {selectedPlan?.charAt(0).toUpperCase()}{selectedPlan?.slice(1)}</h3>
+              <button onClick={() => setShowModal(false)} className="text-muted-foreground hover:text-foreground text-2xl">&times;</button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              Enter your details to start your 14-day free trial. You&apos;ll be charged ${plans.find(p => p.id === selectedPlan)?.price}/employee/month after the trial.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full rounded-lg border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="john@company.com"
+                  className="w-full rounded-lg border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+              {error && (
+                <p className="text-sm text-red-500">{error}</p>
+              )}
+              <button
+                onClick={handleCheckout}
+                disabled={loading !== null || !email || !name}
+                className={cn(
+                  "w-full flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all",
+                  "bg-primary text-primary-foreground hover:bg-primary/90",
+                  (loading || !email || !name) && "opacity-70 cursor-not-allowed"
+                )}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard size={14} />
+                    Start Free Trial
+                  </>
+                )}
+              </button>
+              <p className="text-xs text-muted-foreground text-center">
+                Secured by Flutterwave. Cancel anytime.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </MarketingLayout>
   );
 }

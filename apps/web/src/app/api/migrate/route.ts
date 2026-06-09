@@ -191,6 +191,52 @@ export async function POST(req: Request) {
         recommended_actions JSONB DEFAULT '[]',
         generated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )`,
+      `CREATE TABLE IF NOT EXISTS subscriptions (
+        id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+        company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+        plan VARCHAR(30) NOT NULL,
+        status VARCHAR(30) NOT NULL DEFAULT 'active',
+        flutterwave_subscription_code VARCHAR(100),
+        flutterwave_customer_code VARCHAR(100),
+        amount DECIMAL(10,2) NOT NULL,
+        currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+        start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        next_billing_date TIMESTAMPTZ,
+        end_date TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )`,
+      `CREATE TABLE IF NOT EXISTS payments (
+        id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+        company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+        subscription_id UUID REFERENCES subscriptions(id),
+        flutterwave_tx_ref VARCHAR(100) NOT NULL UNIQUE,
+        flutterwave_tx_id VARCHAR(100),
+        amount DECIMAL(10,2) NOT NULL,
+        currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+        status VARCHAR(30) NOT NULL DEFAULT 'pending',
+        plan VARCHAR(30) NOT NULL,
+        customer_email VARCHAR(255),
+        customer_name VARCHAR(255),
+        flutterwave_response JSONB,
+        verified_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )`,
+      `CREATE TABLE IF NOT EXISTS invoices (
+        id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+        company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+        subscription_id UUID REFERENCES subscriptions(id),
+        payment_id UUID REFERENCES payments(id),
+        invoice_number VARCHAR(50) NOT NULL,
+        amount DECIMAL(12,2) NOT NULL,
+        tax DECIMAL(12,2) DEFAULT 0,
+        total DECIMAL(12,2) NOT NULL,
+        status VARCHAR(30) NOT NULL DEFAULT 'draft',
+        due_date TIMESTAMPTZ,
+        paid_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )`,
     ];
 
     const results: string[] = [];

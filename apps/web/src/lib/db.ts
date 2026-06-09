@@ -14,6 +14,7 @@ import {
   boolean,
   timestamp,
   jsonb,
+  bigint,
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
@@ -205,6 +206,55 @@ export const aiInsights = pgTable("ai_insights", {
   generatedAt: timestamp("generated_at").defaultNow().notNull(),
 });
 
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  companyId: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }).notNull(),
+  plan: varchar("plan", { length: 30 }).notNull(),
+  status: varchar("status", { length: 30 }).notNull().default("active"),
+  flutterwaveSubscriptionCode: varchar("flutterwave_subscription_code", { length: 100 }),
+  flutterwaveCustomerCode: varchar("flutterwave_customer_code", { length: 100 }),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).notNull().default("USD"),
+  startDate: timestamp("start_date").defaultNow().notNull(),
+  nextBillingDate: timestamp("next_billing_date"),
+  endDate: timestamp("end_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const payments = pgTable("payments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  companyId: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }).notNull(),
+  subscriptionId: uuid("subscription_id").references(() => subscriptions.id),
+  flutterwaveTxRef: varchar("flutterwave_tx_ref", { length: 100 }).notNull().unique(),
+  flutterwaveTxId: varchar("flutterwave_tx_id", { length: 100 }),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).notNull().default("USD"),
+  status: varchar("status", { length: 30 }).notNull().default("pending"),
+  plan: varchar("plan", { length: 30 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 255 }),
+  customerName: varchar("customer_name", { length: 255 }),
+  flutterwaveResponse: jsonb("flutterwave_response"),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const invoices = pgTable("invoices", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  companyId: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }).notNull(),
+  subscriptionId: uuid("subscription_id").references(() => subscriptions.id, { onDelete: "set null" }),
+  paymentId: uuid("payment_id").references(() => payments.id, { onDelete: "set null" }),
+  invoiceNumber: varchar("invoice_number", { length: 50 }).notNull(),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  tax: decimal("tax", { precision: 12, scale: 2 }).default("0"),
+  total: decimal("total", { precision: 12, scale: 2 }).notNull(),
+  status: varchar("status", { length: 30 }).notNull().default("draft"),
+  dueDate: timestamp("due_date"),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Create drizzle db instance
 const schema = {
   users,
@@ -221,6 +271,9 @@ const schema = {
   notifications,
   auditLogs,
   aiInsights,
+  subscriptions,
+  payments,
+  invoices,
 };
 
 export const db = drizzle(sql, { schema });
