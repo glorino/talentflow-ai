@@ -225,6 +225,116 @@
   .sparkline {
     @apply h-8 w-16;
   }
+
+  /* Gradient text utility */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+
+  /* Glass morphism cards */
+  .glass-card {
+    @apply rounded-xl border bg-card/60 shadow-sm backdrop-blur-md;
+    @apply transition-all duration-200;
+  }
+  .glass-card:hover {
+    @apply shadow-md bg-card/80;
+  }
+
+  /* Animated gradient borders */
+  .gradient-border {
+    @apply relative rounded-xl bg-card shadow-sm;
+    border: none;
+  }
+  .gradient-border::before {
+    content: "";
+    @apply absolute inset-0 rounded-xl;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)));
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .gradient-border:hover {
+    @apply shadow-md;
+  }
+
+  /* Better hover effects */
+  .hover-lift {
+    @apply transition-all duration-200;
+  }
+  .hover-lift:hover {
+    @apply -translate-y-0.5 shadow-lg;
+  }
+
+  /* Colored card variants */
+  .card-blue {
+    @apply card-enterprise border-l-4 border-l-blue-500;
+  }
+  .card-purple {
+    @apply card-enterprise border-l-4 border-l-purple-500;
+  }
+  .card-emerald {
+    @apply card-enterprise border-l-4 border-l-emerald-500;
+  }
+  .card-amber {
+    @apply card-enterprise border-l-4 border-l-amber-500;
+  }
+  .card-rose {
+    @apply card-enterprise border-l-4 border-l-rose-500;
+  }
+  .card-cyan {
+    @apply card-enterprise border-l-4 border-l-cyan-500;
+  }
+
+  /* Chart container */
+  .chart-container {
+    @apply relative w-full overflow-hidden;
+  }
+  .chart-container svg {
+    @apply w-full h-full;
+  }
+
+  /* Timeline styles */
+  .timeline-item {
+    @apply relative pl-6 pb-6;
+  }
+  .timeline-item::before {
+    content: "";
+    @apply absolute left-[5px] top-2 h-[calc(100%-0.5rem)] w-px bg-border;
+  }
+  .timeline-item::after {
+    content: "";
+    @apply absolute left-0 top-2 h-2.5 w-2.5 rounded-full border-2 border-primary bg-background;
+  }
+  .timeline-item:last-child::before {
+    @apply hidden;
+  }
+
+  /* Donut chart styles */
+  .donut-chart {
+    @apply relative inline-flex items-center justify-center;
+  }
+  .donut-chart-center {
+    @apply absolute flex flex-col items-center justify-center text-center;
+  }
+  .donut-chart-center .donut-value {
+    @apply text-2xl font-bold text-foreground;
+  }
+  .donut-chart-center .donut-label {
+    @apply text-xs text-muted-foreground;
+  }
+  .donut-legend {
+    @apply flex flex-wrap gap-3 mt-3;
+  }
+  .donut-legend-item {
+    @apply flex items-center gap-1.5 text-xs text-muted-foreground;
+  }
+  .donut-legend-dot {
+    @apply h-2 w-2 rounded-full flex-shrink-0;
+  }
 }
 
 /* Animations */
@@ -264,6 +374,12 @@
   }
 }
 
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .animate-slide-up {
   animation: slide-up 0.4s ease-out forwards;
 }
@@ -290,18 +406,62 @@
 .stagger-children > *:nth-child(7) { animation-delay: 300ms; }
 .stagger-children > *:nth-child(8) { animation-delay: 350ms; }
 
-/* Scrollbar */
+/* Refined scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: hsl(var(--muted) / 0.3);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.2);
-  border-radius: 3px;
+  background: hsl(var(--muted-foreground) / 0.25);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.3);
+  background: hsl(var(--muted-foreground) / 0.4);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Print styles */
+@media print {
+  .sidebar,
+  header,
+  .ai-fab,
+  .floating-actions,
+  nav {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .card-enterprise,
+  .glass-card,
+  .gradient-border {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Selection color */
+::selection {
+  background-color: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
 }

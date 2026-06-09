@@ -34,16 +34,5 @@
       "destination": "/api/:path*"
     }
   ],
-  "redirects": [
-    {
-      "source": "/login",
-      "destination": "/sign-in",
-      "permanent": true
-    },
-    {
-      "source": "/register",
-      "destination": "/sign-up",
-      "permanent": true
-    }
-  ]
+  "redirects": []
 }
