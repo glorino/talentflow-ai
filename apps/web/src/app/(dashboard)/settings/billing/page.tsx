@@ -20,7 +20,7 @@ const PLANS = [
   {
     id: "starter",
     name: "Starter",
-    price: 9,
+    price: 14500,
     period: "per employee/month",
     gradient: "from-blue-500 to-blue-600",
     cardClass: "stat-card-blue",
@@ -37,7 +37,7 @@ const PLANS = [
   {
     id: "professional",
     name: "Professional",
-    price: 19,
+    price: 29000,
     period: "per employee/month",
     gradient: "from-purple-500 to-purple-600",
     cardClass: "stat-card-purple",
@@ -56,7 +56,7 @@ const PLANS = [
   {
     id: "enterprise",
     name: "Enterprise",
-    price: 39,
+    price: 59000,
     period: "per employee/month",
     gradient: "from-amber-500 to-orange-500",
     cardClass: "stat-card-amber",
@@ -79,7 +79,7 @@ const PAYMENT_HISTORY = [
   {
     id: 1,
     date: "2026-06-01",
-    amount: 950,
+    amount: 143500,
     status: "successful",
     reference: "TF-2026-0601-001",
     description: "Professional Plan - June 2026",
@@ -87,7 +87,7 @@ const PAYMENT_HISTORY = [
   {
     id: 2,
     date: "2026-05-01",
-    amount: 950,
+    amount: 143500,
     status: "successful",
     reference: "TF-2026-0501-002",
     description: "Professional Plan - May 2026",
@@ -95,7 +95,7 @@ const PAYMENT_HISTORY = [
   {
     id: 3,
     date: "2026-04-01",
-    amount: 950,
+    amount: 143500,
     status: "successful",
     reference: "TF-2026-0401-003",
     description: "Professional Plan - April 2026",
@@ -103,7 +103,7 @@ const PAYMENT_HISTORY = [
   {
     id: 4,
     date: "2026-03-15",
-    amount: 190,
+    amount: 29000,
     status: "pending",
     reference: "TF-2026-0315-004",
     description: "Plan Upgrade - Starter to Professional",
@@ -111,7 +111,7 @@ const PAYMENT_HISTORY = [
   {
     id: 5,
     date: "2026-03-01",
-    amount: 450,
+    amount: 59000,
     status: "failed",
     reference: "TF-2026-0301-005",
     description: "Starter Plan - March 2026",
@@ -119,7 +119,7 @@ const PAYMENT_HISTORY = [
   {
     id: 6,
     date: "2026-02-01",
-    amount: 450,
+    amount: 59000,
     status: "successful",
     reference: "TF-2026-0201-006",
     description: "Starter Plan - February 2026",
@@ -127,12 +127,12 @@ const PAYMENT_HISTORY = [
 ];
 
 const INVOICES = [
-  { id: "INV-2026-0601", date: "2026-06-01", amount: 950, status: "paid" },
-  { id: "INV-2026-0501", date: "2026-05-01", amount: 950, status: "paid" },
-  { id: "INV-2026-0401", date: "2026-04-01", amount: 950, status: "paid" },
-  { id: "INV-2026-0315", date: "2026-03-15", amount: 190, status: "pending" },
-  { id: "INV-2026-0301", date: "2026-03-01", amount: 450, status: "failed" },
-  { id: "INV-2026-0201", date: "2026-02-01", amount: 450, status: "paid" },
+  { id: "INV-2026-0601", date: "2026-06-01", amount: 143500, status: "paid" },
+  { id: "INV-2026-0501", date: "2026-05-01", amount: 143500, status: "paid" },
+  { id: "INV-2026-0401", date: "2026-04-01", amount: 143500, status: "paid" },
+  { id: "INV-2026-0315", date: "2026-03-15", amount: 29000, status: "pending" },
+  { id: "INV-2026-0301", date: "2026-03-01", amount: 59000, status: "failed" },
+  { id: "INV-2026-0201", date: "2026-02-01", amount: 59000, status: "paid" },
 ];
 
 export default function BillingPage() {
@@ -303,9 +303,9 @@ export default function BillingPage() {
             {/* Monthly Cost */}
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Monthly Cost</p>
-              <p className="text-2xl font-bold">${monthlyCost.toLocaleString()}</p>
+              <p className="text-2xl font-bold">₦{monthlyCost.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground">
-                {employeeCount} employees &times; ${perEmployeeCost}/mo
+                {employeeCount} employees &times; ₦{perEmployeeCost.toLocaleString()}/mo
               </p>
             </div>
 
@@ -373,11 +373,11 @@ export default function BillingPage() {
                   <div className="relative z-10">
                     <h3 className="text-xl font-bold">{plan.name}</h3>
                     <div className="mt-3 flex items-baseline gap-1">
-                      <span className="text-4xl font-extrabold">${plan.price}</span>
+                      <span className="text-4xl font-extrabold">₦{plan.price.toLocaleString()}</span>
                       <span className="text-sm text-white/70">/{plan.period}</span>
                     </div>
                     <p className="mt-1 text-sm text-white/80">
-                      ${(plan.price * employeeCount).toLocaleString()}/mo for {employeeCount} employees
+                      ₦{(plan.price * employeeCount).toLocaleString()}/mo for {employeeCount} employees
                     </p>
                   </div>
                 </div>
@@ -454,7 +454,7 @@ export default function BillingPage() {
                     {new Date(payment.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </td>
                   <td className="px-6 py-4 text-sm font-medium">{payment.description}</td>
-                  <td className="px-6 py-4 text-sm font-semibold">${payment.amount.toLocaleString()}</td>
+                  <td className="px-6 py-4 text-sm font-semibold">₦{payment.amount.toLocaleString()}</td>
                   <td className="px-6 py-4">
                     <span className={cn("text-[10px] font-semibold uppercase", statusBadge(payment.status))}>
                       {payment.status}
@@ -489,7 +489,7 @@ export default function BillingPage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-sm font-semibold">${invoice.amount.toLocaleString()}</p>
+                    <p className="text-sm font-semibold">₦{invoice.amount.toLocaleString()}</p>
                     <span className={cn("text-[10px] font-semibold uppercase", statusBadge(invoice.status))}>
                       {invoice.status}
                     </span>

@@ -6,7 +6,7 @@ const plans = [
     name: "Starter",
     price: 9,
     pricePerEmployee: true,
-    currency: "USD",
+    currency: "NGN",
     interval: "month",
     description: "Perfect for small teams getting started with HR management",
     features: [
@@ -25,7 +25,7 @@ const plans = [
     name: "Professional",
     price: 19,
     pricePerEmployee: true,
-    currency: "USD",
+    currency: "NGN",
     interval: "month",
     description: "For growing companies that need advanced HR features",
     features: [
@@ -46,7 +46,7 @@ const plans = [
     name: "Enterprise",
     price: 39,
     pricePerEmployee: true,
-    currency: "USD",
+    currency: "NGN",
     interval: "month",
     description: "For large organizations with complex HR needs",
     features: [

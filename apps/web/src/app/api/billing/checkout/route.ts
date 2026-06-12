@@ -6,9 +6,9 @@ const FLUTTERWAVE_BASE = "https://api.flutterwave.com/v3";
 const FLW_SECRET_KEY = process.env.FLUTTERWAVE_SECRET_KEY!;
 
 const PLAN_PRICES: Record<string, number> = {
-  starter: 9,
-  professional: 19,
-  enterprise: 39,
+  starter: 14500,
+  professional: 29000,
+  enterprise: 59000,
 };
 
 export async function POST(request: NextRequest) {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       companyId,
       flutterwaveTxRef: txRef,
       amount: String(amount),
-      currency: "USD",
+      currency: "NGN",
       status: "pending",
       plan,
       customerEmail: email,
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         tx_ref: txRef,
         amount,
-        currency: "USD",
+        currency: "NGN",
         redirect_url: `${origin}/api/billing/verify`,
         customer: { email, name },
         meta: [{ companyId, plan }],

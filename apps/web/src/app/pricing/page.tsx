@@ -26,7 +26,7 @@ const plans = [
     id: "starter",
     name: "Starter",
     description: "For small teams getting started",
-    price: 9,
+    price: 14500,
     period: "per employee/month",
     icon: Users,
     color: "from-blue-500 to-blue-600",
@@ -47,7 +47,7 @@ const plans = [
     id: "professional",
     name: "Professional",
     description: "For growing companies",
-    price: 19,
+    price: 29000,
     period: "per employee/month",
     icon: Zap,
     color: "from-purple-500 to-purple-600",
@@ -70,7 +70,7 @@ const plans = [
     id: "enterprise",
     name: "Enterprise",
     description: "For large organizations",
-    price: 39,
+    price: 59000,
     period: "per employee/month",
     icon: Building2,
     color: "from-amber-500 to-orange-500",
@@ -179,7 +179,7 @@ export default function PricingPage() {
           public_key: process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY!,
           tx_ref: data.data.txRef,
           amount: data.data.amount,
-          currency: "USD",
+          currency: "NGN",
           payment_options: "card,banktransfer,ussd",
           redirect_url: `${window.location.origin}/api/billing/verify`,
           customer: { email, name },
@@ -251,7 +251,7 @@ export default function PricingPage() {
                   <h3 className="text-xl font-bold">{plan.name}</h3>
                   <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
                   <div className="mt-6 mb-6">
-                    <span className="text-4xl font-bold">${plan.price}</span>
+                    <span className="text-4xl font-bold">₦{plan.price.toLocaleString()}</span>
                     <span className="text-muted-foreground">/{plan.period}</span>
                   </div>
                   {plan.id === "enterprise" ? (
@@ -388,7 +388,7 @@ export default function PricingPage() {
               <button onClick={() => setShowModal(false)} className="text-muted-foreground hover:text-foreground text-2xl">&times;</button>
             </div>
             <p className="text-sm text-muted-foreground mb-6">
-              Enter your details to start your 14-day free trial. You&apos;ll be charged ${plans.find(p => p.id === selectedPlan)?.price}/employee/month after the trial.
+              Enter your details to start your 14-day free trial.               You&apos;ll be charged ₦{plans.find(p => p.id === selectedPlan)?.price.toLocaleString()}/employee/month after the trial.
             </p>
             <div className="space-y-4">
               <div>
